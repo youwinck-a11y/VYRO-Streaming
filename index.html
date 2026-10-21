@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#09090d">
+<title>VYRO | Streaming</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#09090d;color:#fff;font-family:Arial,sans-serif}
+header{padding:20px 5%;display:flex;align-items:center;gap:20px;flex-wrap:wrap;background:#14141c;border-bottom:1px solid #292936}
+.logo{font-size:30px;font-weight:900;color:#a78bfa}
+nav{display:flex;gap:16px;flex-wrap:wrap}nav a{color:#fff;text-decoration:none}
+input{padding:12px;border-radius:8px;background:#22222d;color:#fff;border:1px solid #444;flex:1;min-width:180px}
+.hero{padding:55px 6%;background:linear-gradient(110deg,#40235b,#101019)}.hero h1{font-size:clamp(36px,6vw,58px)}.hero p{color:#d1cddd}
+button{padding:11px 16px;border:0;border-radius:8px;background:#8b5cf6;color:#fff;cursor:pointer}
+main{padding:25px 5%}.filters{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.filters button{background:#292936}.filters .active{background:#8b5cf6}
+.catalogo{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:18px}
+.card{background:#191922;border:1px solid #292936;border-radius:10px;overflow:hidden}
+.card img{width:100%;aspect-ratio:2/3;object-fit:cover;display:block;background:#252035}
+.info{padding:12px}.info h3{font-size:16px;margin:4px 0 10px}.info p{font-size:13px;color:#bbb;line-height:1.45}.info .sinopsis{min-height:55px}.info button{width:100%}
+#estado{color:#bbb}footer{padding:25px 5%;color:#999}
+@media(max-width:500px){header{gap:14px}.logo{width:100%}.catalogo{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div class="logo">VYRO</div><nav><a href="#inicio">Inicio</a><a href="#catalogo">Catálogo</a></nav><input id="buscar" type="search" placeholder="Buscar películas, series o anime..." aria-label="Buscar catálogo"></header>
+<section class="hero" id="inicio"><p>BIENVENIDO A VYRO</p><h1>Historias que<br>te atrapan.</h1><p>Películas, series y anime en un solo lugar.</p><button type="button" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})">Explorar catálogo</button></section>
+<main id="catalogo"><h2>Descubre contenido</h2><div class="filters"><button type="button" class="active" data-tipo="Todos">Todo</button><button type="button" data-tipo="Película">Películas</button><button type="button" data-tipo="Serie">Series</button><button type="button" data-tipo="Anime">Anime</button></div><p id="estado" aria-live="polite"></p><div class="catalogo" id="resultados"></div></main>
+<footer>VYRO © 2026 · Entretenimiento autorizado</footer>
+<script>
+const titulos=[
+{nombre:"Planeta azul",tipo:"Película",genero:"Aventura · Ciencia ficción",anio:2025,sinopsis:"Un viaje por un océano desconocido revela un mundo lleno de misterios.",poster:"planeta-azul.svg"},
+{nombre:"Mundos ocultos",tipo:"Serie",genero:"Misterio · Fantasía",anio:2024,sinopsis:"Un grupo de amigos descubre secretos escondidos en su ciudad.",poster:"mundos-ocultos.svg"},
+{nombre:"Aventura estelar",tipo:"Anime",genero:"Acción · Ciencia ficción",anio:2026,sinopsis:"Un joven explorador emprende una misión más allá de las estrellas.",poster:"aventura-estelar.svg"},
+{nombre:"El último viaje",tipo:"Película",genero:"Drama · Aventura",anio:2023,sinopsis:"Un viaje inesperado cambiará el destino de una familia.",poster:"el-ultimo-viaje.svg"},
+{nombre:"Nuevos horizontes",tipo:"Serie",genero:"Drama · Ciencia ficción",anio:2025,sinopsis:"Los habitantes de una colonia buscan un nuevo futuro.",poster:"nuevos-horizontes.svg"},
+{nombre:"Leyenda del dragón",tipo:"Anime",genero:"Fantasía · Acción",anio:2024,sinopsis:"Un aprendiz descubre un poder antiguo y debe aprender a controlarlo.",poster:"leyenda-del-dragon.svg"},
+{nombre:"Ciudad de neón",tipo:"Película",genero:"Suspenso · Misterio",anio:2026,sinopsis:"Una investigación revela una conspiración en una ciudad futurista.",poster:"ciudad-de-neon.svg"},
+{nombre:"Guardianes del alba",tipo:"Anime",genero:"Fantasía · Aventura",anio:2025,sinopsis:"Tres guardianes protegen un reino amenazado por una fuerza desconocida.",poster:"guardianes-del-alba.svg"},
+{nombre:"Frecuencia cero",tipo:"Serie",genero:"Misterio · Suspenso",anio:2023,sinopsis:"Una señal de radio conecta sucesos que parecían no tener relación.",poster:"frecuencia-cero.svg"}];
+let filtro="Todos";
+const resultados=document.getElementById("resultados"), buscar=document.getElementById("buscar"), estado=document.getElementById("estado");
+function mostrar(){
+ const texto=buscar.value.toLowerCase().trim();
+ const lista=titulos.filter(t=>(filtro==="Todos"||t.tipo===filtro)&&(t.nombre+" "+t.genero+" "+t.sinopsis+" "+t.anio).toLowerCase().includes(texto));
+ resultados.replaceChildren();
+ estado.textContent=lista.length?lista.length+(lista.length===1?" título":" títulos")+" de demostración":"No hay resultados.";
+ lista.forEach(t=>{
+  const tarjeta=document.createElement("article");tarjeta.className="card";
+  const img=document.createElement("img");img.alt="Cartel ilustrativo: "+t.nombre;img.loading="lazy";img.src="posters/"+t.poster;
+  const info=document.createElement("div");info.className="info";
+  const titulo=document.createElement("h3");titulo.textContent=t.nombre;
+  const tipo=document.createElement("p");tipo.textContent=t.tipo+" · "+t.anio;
+  const genero=document.createElement("p");genero.textContent=t.genero;
+  const sinopsis=document.createElement("p");sinopsis.className="sinopsis";sinopsis.textContent=t.sinopsis;
+  const boton=document.createElement("button");boton.type="button";boton.textContent="Ver detalles";
+  boton.onclick=()=>alert(t.nombre+" ("+t.anio+")\n\n"+t.tipo+"\n"+t.genero+"\n\n"+t.sinopsis);
+  info.append(titulo,tipo,genero,sinopsis,boton);tarjeta.append(img,info);resultados.append(tarjeta);
+ });
+}
+document.querySelectorAll(".filters button").forEach(b=>b.addEventListener("click",()=>{filtro=b.dataset.tipo;document.querySelectorAll(".filters button").forEach(x=>x.classList.toggle("active",x===b));mostrar();}));
+buscar.addEventListener("input",mostrar);mostrar();
+</script>
+</body>
+</html>
